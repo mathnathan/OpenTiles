@@ -3,7 +3,9 @@ from urllib2 import urlopen, URLError, HTTPError
 from ftplib import FTP
 from dataSources import DATA_FIELD
 
-DST_DIR = "/home/olmo/tomcat/tomcat/webapps/nasa/"
+#DST_DIR = "/home/olmo/tomcat/tomcat/webapps/nasa/"
+tomcat_dir = "tomcat/webapps/nasa/"
+DST_DIR = os.path.join( os.path.dirname(__file__), tomcat_dir )
 
 # CHECK FTP
 def updated( url ):
@@ -20,7 +22,9 @@ def download( url ):
     protocol = url.split(':')[0]
     print "PROTOCOL = ", protocol
     print "url = ", url
-    print "split = ", url.split('/')[:-1]
+    print "split = ", url.split('/')
+    print "downloading ", url.split('/')[-1]
+    print "join = ", '/'.join(url.split('/')[2:-1])
     if( protocol == "ftp" ):
         dlftp( url )
     elif( protocol == "http" or protocol == "https" ):
@@ -29,25 +33,28 @@ def download( url ):
         exit( "ERROR: Don't recognize url protocol request\n" )
 
 # DOWNLOAD VIA FTP
-def dlftp( url ):
+def dlftp( full_url ):
     """Download the file at the url using ftp"""
 
-    ftp = FTP(url.split('/')[:-1])
+    url_list = full_url.split('/')
+    ftp_url = url_list[2]
+    filename = url_list[-1]
+    path2file = '/'.join(url_list[3:])
+    print "\nurl_list = ", url_list
+    print "ftp_url = ", ftp_url
+    print "filename = ", filename
+    print "path2file = ", path2file, "\n"
+    ftp = FTP( ftp_url )
     ftp.login()
-    ftp.retrlines("LIST")
-
-    ftp.cwd("folderOne")
-    ftp.cwd("subFolder") # or ftp.cwd("folderOne/subFolder")
 
     listing = []
     ftp.retrlines("LIST", listing.append)
-    words = listing[0].split(None, 8)
-    filename = words[-1].lstrip()
 
 # download the file
-    local_filename = os.path.join(r"c:\myfolder", filename)
-    lf = open(local_filename, "wb")
-    ftp.retrbinary("RETR " + filename, lf.write, 8*1024)
+
+    print "dst_dir = ", DST_DIR
+    lf = open(DST_DIR+filename, "wb")
+    ftp.retrbinary("RETR " + path2file, lf.write, 8*1024)
     lf.close()
 
 # DOWNLOAD VIA HTTP
@@ -85,6 +92,11 @@ def main():
     sensor = "MODIS"
     collection = "AS41"
     product = 2
+
+    if( not os.path.exists( tomcat_dir ) ):
+        print "os path = ", os.path.exists( tomcat_dir )
+        os.makedirs( tomcat_dir )
+        print "os path = ", os.path.exists( tomcat_dir )
 
     # Simulate a database query
     url = extractURL( field, dtype, sensor, collection, product )
