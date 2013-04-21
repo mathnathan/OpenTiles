@@ -261,10 +261,10 @@ savvy users.
 
 # This very poorly emulates a specific database relationship using dictionaries and lists
 # however it will suffice for our proof of concept
-SOURCES = "ftp://ladsweb.nascom.nasa.gov/allData/3/MOD04_L2/2002/241/MOD04_L2.A2002241.0010.003.2002245150635.hdf"
+SOURCES = "ftp://weldftp.cr.usgs.gov/ALASKA/2003/weekly/week14/Alaska.week14.2003.h00v13.v1.5.hdf"
 # Skips the date and time
 PRODUCTS = {2: SOURCES}
-COLLECTIONS = {"AS41": PRODUCTS}
+COLLECTIONS = {"AS3": PRODUCTS}
 LAND_SENSORS = {"MODIS": COLLECTIONS}
 DATA_TYPE = {"Temperature": LAND_SENSORS}
 DATA_FIELD = {"Land": DATA_TYPE}
