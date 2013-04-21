@@ -1,9 +1,11 @@
 import os
+import sys
 from constants import *
 from urllib2 import urlopen, URLError, HTTPError
 from ftplib import FTP
 from dataSources import DATA_FIELD
 from converter import convert
+from generateTiles import makeTiles
 
 # CHECK FTP
 def updated( url ):
@@ -20,11 +22,6 @@ def download( url, protocol=None ):
 
     if( protocol == None ):
         protocol = url.split(':')[0]
-    print "PROTOCOL = ", protocol
-    print "url = ", url
-    print "split = ", url.split('/')
-    print "downloading ", url.split('/')[-1]
-    print "join = ", '/'.join(url.split('/')[2:-1])
     if( protocol.lower() == "ftp" ):
         return dlftp( url )
     elif( protocol.lower() == "http" or protocol.lower() == "https" ):
@@ -39,11 +36,8 @@ def dlftp( full_url ):
     url_list = full_url.split('/')
     ftp_url = url_list[2]
     filename = url_list[-1]
+    print "Downloading " + filename + "...\n"
     path2file = '/'.join(url_list[3:])
-    print "\nurl_list = ", url_list
-    print "ftp_url = ", ftp_url
-    print "filename = ", filename
-    print "path2file = ", path2file, "\n"
     ftp = FTP( ftp_url )
     ftp.login()
 
@@ -52,7 +46,6 @@ def dlftp( full_url ):
 
 # download the file
 
-    print "dst_dir = ", DST_DIR
     dlDir = DST_DIR+filename
     lf = open(dlDir, "wb")
     ftp.retrbinary("RETR " + path2file, lf.write, 8*1024)
@@ -67,12 +60,12 @@ def dlhttp( full_url ):
     url_list = full_url.split('/')
     http_url = url_list[2]
     filename = url_list[-1]
+    print "Downloading" + filename + "...\n"
     path2file = '/'.join(url_list[3:])
 
     # Open the url
     try:
         f = urlopen(url)
-        print "downloading " + filename
 
         # Open our local file for writing
         dlDir = DST_DIR+filename
@@ -105,16 +98,15 @@ def main():
     product = 2
 
     if( not os.path.exists( tomcat_dir ) ):
-        print "os path = ", os.path.exists( tomcat_dir )
         os.makedirs( tomcat_dir )
-        print "os path = ", os.path.exists( tomcat_dir )
 
     # Simulate a database query
     url = extractURL( field, dtype, sensor, collection, product )
 
     if( updated( url ) ):
         dlFile = download( url, "FTP" )
-        convert( dlFile, "HDF" )
+        abs_path = convert( dlFile, "HDF" )
+        makeTiles( abs_path )
     else:
         pass
 
