@@ -14,7 +14,7 @@ Maps or MapQuest.
 #### Authors
 
 Nathan Crock - mathnathan@gmail.com <br />
-[Olmo Savala][http://olmozavala.com] - osz09@fsu.edu <br />
+[Olmo Zavala][http://olmozavala.com] - osz09@fsu.edu <br />
 [Sam Rustan][http://github.com/samrustan] - samrustan@gmail.com
 
 #### Institution
