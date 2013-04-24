@@ -13,12 +13,23 @@ Maps or MapQuest.
 
 #### Authors
 
-Nathan Crock - mathnathan@gmail.com <br />
-[Olmo Zavala][http://olmozavala.com] - osz09@fsu.edu <br />
-[Sam Rustan][http://github.com/samrustan] - samrustan@gmail.com
+[Nathan Crock]: http://mathnathan.com
+[Olmo Zavala]: http://olmozavala.com
+[Sam Rustan]: http://github.com/samrustan
 
-#### Institution
-##### Making Awesome
+[Nathan Crock][] - mathnathan@gmail.com <br />
+[Olmo Zavala][] - osz09@fsu.edu <br />
+[Sam Rustan][] - samrustan@gmail.com
+
+#### Institutions and Affiliations
+[Making Awesome]: http://makingawesome.org
+[Florida State University]: http://fsu.edu
+[Department of Scientific Computing]: http://sc.fsu.edu
+[Center for Ocean-Atmospheric Prediction Studies]: http://coaps.fsu.edu
+##### [Making Awesome][]
+##### [Florida State University][]
+##### [Department of Scientific Computing][]
+##### [Center for Ocean-Atmospheric Prediction Studies][]
 
 <br />
 
@@ -35,7 +46,7 @@ Nathan Crock - mathnathan@gmail.com <br />
 
 Our solution OpenTiles is more of a service than a product. Currently it is a 
 simple implementation intended as a proof of concept demonstrating the 5 main 
-components of the project. We now explain how would operate at a production scale. 
+components of the project. We now explain how it would operate at a production scale. 
 
 Let us take a very large storage system with no satellite data. This is the backend
 of OpenTiles. Python scripts will take care of the first 3 components.
@@ -43,16 +54,16 @@ of OpenTiles. Python scripts will take care of the first 3 components.
 ##### 1) Download
 
 A script will constantly query the databases and servers where satellite data is 
-stored. If the scripts find a data file that that is not on the local drive, it will 
-download it. This first component ensures all the data on the backend of OpenTiles is
-current.
+stored. If the scripts find a data file that that is not on the local drive or has 
+been updated, it will download it. This first component ensures all the data on 
+the backend of OpenTiles is current.
 
 ##### 2) Convert 
 
 Satellite observations are stored in various formats. While they all have their benefits
 a collection of files in a more unified, GIS friendly format, would be more practical. 
 After the data has been downloaded it is converted from its native type, most commonly 
-NetCDF and HDF, into a Geotiff (Gtiff) file. We use the GDAL library for conversion.
+NetCDF and HDF, into a Geotiff (Gtiff) file. We use the GDAL library for conversions.
 
 ##### 3) Crop and Scale
 
