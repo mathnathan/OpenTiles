@@ -21,6 +21,4 @@ public class geotiffFileFilter implements FileFilter{
 		else
 			return false;
 	}
-	
-	
 }

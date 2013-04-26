@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : TreeExample.xml
+    Created on : October 17, 2011, 11:02 AM
+    Author     : Olmo Zavala Romerozavala
+    Description:
+        Purpose of the document follows.
+--><MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
+    <MenuEntries>
+        <MenuEntry ID="test" EN="TEST" ES="TEST ESP" />
+        <MenuEntry ID="geotifftest" EN="Geotiff test" ES="Geotiff ESP" />
+        <MenuEntry ID="teststates" EN="US states" ES="Estados" />
+    <MenuEntry ID="1tempMaximaTiff_1_1.tif" EN="1tempMaximaTiff_1_1.tif" />
+<MenuEntry ID="2tempMaximaTiff_1_2.tif" EN="2tempMaximaTiff_1_2.tif" />
+</MenuEntries>
+
+    <BackgroundLayers BBOX="-180,90,-90,180" format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms">
+        <layer name="comm:pyrResult512" featureInfo="comm:gebco" title="GEBCO" />
+        <!--format="image/jpeg" proj="EPSG:4326" server="http://185.12.6.237:8080/geoserver/earthtiles/wms">-->
+        <!--<layer name="earthtiles:landsat" title="GEBCO"/>-->
+    </BackgroundLayers>
+
+    <!-- GeotiffLayer -->
+    <MainLayers BBOX="-125.02083333333,24.062499999999996,-66.47916666198,49.937500002069996" format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms" width="764" height="330" tiled="true" ncWMS="false">  
+        <layer Menu="test,geotifftest" EN="Geotiff" ES="Geotiff ESP" name="se_clim:TotPrec2010Jan" />
+    <layer Menu="1tempMaximaTiff_1_1.tif" EN="1tempMaximaTiff_1_1.tif" BBOX="-125.0,-91.66666666666669,35.0,4.999999999999975" server="http://localhost:8080/geoserver/wms" tiled="true" format="image/jpeg" style="raster" />
+<layer Menu="2tempMaximaTiff_1_2.tif" EN="2tempMaximaTiff_1_2.tif" BBOX="-91.66666666666669,-75.00000000000003,35.0,4.999999999999975" server="http://localhost:8080/geoserver/wms" tiled="true" format="image/jpeg" style="raster" />
+</MainLayers>
+
+    <VectorLayers BBOX="-120,-59.983333333333,-10,50.0166666666666" format="image/jpeg" server="http://viewer.coaps.fsu.edu/geoserver/wms" tiled="true" trans_effect="none" vectorLayer="true"> 
+        <layer Menu="teststates" name="comm:states" selected="true" />
+    <layer Menu="1tempMaximaTiff_1_1.tif" EN="1tempMaximaTiff_1_1.tif" BBOX="-125.0,-91.66666666666669,35.0,4.999999999999975" selected="true" server="http://localhost:8080/geoserver/wms" name="nasa:1tempMaximaTiff_1_1.tif" tiled="true" format="image/jpeg" style="raster" />
+<layer Menu="2tempMaximaTiff_1_2.tif" EN="2tempMaximaTiff_1_2.tif" BBOX="-91.66666666666669,-75.00000000000003,35.0,4.999999999999975" selected="true" server="http://localhost:8080/geoserver/wms" name="nasa:2tempMaximaTiff_1_2.tif" tiled="true" format="image/jpeg" style="raster" />
+</VectorLayers>
+</MenuConf>

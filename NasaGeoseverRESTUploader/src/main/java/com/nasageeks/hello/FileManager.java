@@ -32,6 +32,7 @@ public class FileManager {
 	 * @return String[] List of files inside the folder. 
 	 */
 	public static String[] filesInFolder(String folder, FileFilter filter) {
+
 		File searchFolder = new File(folder);
 
 		File[] files = searchFolder.listFiles(filter);

@@ -3,45 +3,37 @@ package com.nasageeks.hello;
 import com.nasageeks.filefilters.geotiffFileFilter;
 import gov.nasa.worldwind.formats.tiff.GeoCodec;
 import gov.nasa.worldwind.formats.tiff.GeotiffReader;
-import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
-import it.geosolutions.geoserver.rest.GeoServerRESTReader;
-import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
+import it.geosolutions.geoserver.rest.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import com.nasageeks.hello.BoundaryBox;
-
-import org.xml.sax.SAXException;
+import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 /**
- * Hello world!
+ * Automatic application that upload NASA geotiff files into a Geoserver website
  *
  */
 public class App {
+
+	/**
+	 * Only used to display the current directory. Useful to find the properties file.
+	 */
+	public static void showCurrentDir() throws IOException{
+			String current = new java.io.File(".").getCanonicalPath();
+			System.out.println("Current dir:" + current);
+			String currentDir = System.getProperty("user.dir");
+			System.out.println("Current dir using System:" + currentDir);
+	}
 
 	public static void main(String[] args) throws FileNotFoundException {
 
@@ -49,26 +41,30 @@ public class App {
 		try {
 
 			String RESTURL = "http://localhost:8080/geoserver";
-			String RESTUSER = "admin";
-			String RESTPW = "geoserver";
+			String RESTUSER = "nasa";
+			String RESTPW = "isac13";
+
+			Properties props = new Properties();
+			FileInputStream file = new FileInputStream("./Params.properties");
+			props.load(file);
 
 			// write 
-			String workspace = "nasa";
-			String store = "newstore";
-			String server= "http://localhost:8080/geoserver/wms"; 
-			String filePath = "/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/exampleData/tiles/";
+			String workspace = props.getProperty("workspace");
+			String store = props.getProperty("store");
+			String server = props.getProperty("server");
+			String filePath = props.getProperty("filePath");
 
-			String[] geotTiffFiles = FileManager.filesInFolder(filePath,new geotiffFileFilter());
+			String[] geotTiffFiles = FileManager.filesInFolder(filePath, new geotiffFileFilter());
 
-			for(int x=0;x<geotTiffFiles.length; x++){
+			for (int x = 0; x < geotTiffFiles.length; x++) {
 
-//				GeoServerRESTReader readerGeoserver = new GeoServerRESTReader(RESTURL, RESTUSER, RESTPW);
+				GeoServerRESTReader readerGeoserver = new GeoServerRESTReader(RESTURL, RESTUSER, RESTPW);
 				GeoServerRESTPublisher publisherGeoserver = new GeoServerRESTPublisher(RESTURL, RESTUSER, RESTPW);
 
 				File geotiff = new File(geotTiffFiles[x]);
 				String fileName = geotiff.getName();
 
-				System.out.println("FileName: "+fileName);
+				System.out.println("FileName: " + fileName);
 				String coverageName = fileName;
 
 				String srs = "EPSG:4326";
@@ -78,7 +74,7 @@ public class App {
 
 				boolean created = publisherGeoserver.createWorkspace(workspace);
 				if (created) {
-					System.out.println("New workspace created yeah babe!");
+					System.out.println("The workspace "+workspace+" has been created, yeah!");
 				}
 
 				GeotiffReader reader = new GeotiffReader(geotTiffFiles[x]);
@@ -87,22 +83,19 @@ public class App {
 					//now get bounding box coordinates for entire image
 
 					@SuppressWarnings("MismatchedReadAndWriteOfArray")
-
 					double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
-					BoundaryBox BBOX = new BoundaryBox(bbox[0],bbox[1],bbox[2],bbox[3]);
+					BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[1], bbox[2], bbox[3]);
 
-					System.out.println("Pusblishing Geotiff file name: "+geotiff.getName()+" with BBOX: "+BBOX.toString());
+					System.out.println("Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString());
 					publisherGeoserver.publishGeoTIFF(workspace, store, coverageName, geotiff, srs, proj, def, bbox);
-
-//					publishLayer(geotTiffFiles[x]);
 
 					SAXBuilder builder = new SAXBuilder(); //used to read XML
 
-					String layersFile;
-					if(x==0){
-						layersFile = "/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/NASA_Template/web/layers/Default/Layers.xml";
-					}else{
-						layersFile = "/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/NASA_Template/web/layers/NewLayers.xml";
+					String layersFile = props.getProperty("layers");
+					if (x == 0) {
+						layersFile = layersFile+"Default/Layers.xml";
+					} else {
+						layersFile = layersFile+"NewLayers.xml";
 					}
 
 					Document doc = builder.build(layersFile);
@@ -118,50 +111,36 @@ public class App {
 //							System.out.println(curr.getName());
 
 							Element newElement = new Element("MenuEntry");
-							newElement.setAttribute("ID",fileName);
-							newElement.setAttribute("EN",fileName);
+							newElement.setAttribute("ID", fileName);
+							newElement.setAttribute("EN", fileName);
 
 							curr.addContent(newElement);
 							curr.addContent("\n");
 						}
-						if (curr.getName().equals("MainLayers")) {
+						if (curr.getName().equals("MainLayers") || curr.getName().equals("VectorLayers")) {
 //							System.out.println(curr.getName());
 
 							Element newElement = new Element("layer");
-							newElement.setAttribute("Menu",fileName);
-							newElement.setAttribute("EN",fileName);
-							newElement.setAttribute("BBOX",BBOX.toString());
-							newElement.setAttribute("server",server);
-							newElement.setAttribute("tiled","true");
-							newElement.setAttribute("format","image/jpeg");
-							newElement.setAttribute("style","raster");
+							newElement.setAttribute("Menu", fileName);
+							newElement.setAttribute("EN", fileName);
+							newElement.setAttribute("BBOX", BBOX.toString());
+							newElement.setAttribute("server", server);
+							newElement.setAttribute("tiled", "true");
+							newElement.setAttribute("format", "image/jpeg");
+							newElement.setAttribute("style", "raster");
+
+							if (curr.getName().equals("VectorLayers")) {
+								newElement.setAttribute("selected", "true");
+								newElement.setAttribute("name", workspace + ":" + fileName);
+							}
 
 							curr.addContent(newElement);
 							curr.addContent("\n");
 						}
-						if (curr.getName().equals("VectorLayers")) {
-//							System.out.println(curr.getName());
-
-							Element newElement = new Element("layer");
-							newElement.setAttribute("Menu",fileName);
-							newElement.setAttribute("EN",fileName);
-							newElement.setAttribute("BBOX",BBOX.toString());
-							newElement.setAttribute("selected","true");
-							newElement.setAttribute("server",server);
-							newElement.setAttribute("name",workspace+":"+fileName);
-							newElement.setAttribute("tiled","true");
-							newElement.setAttribute("format","image/jpeg");
-							newElement.setAttribute("style","raster");
-
-							curr.addContent(newElement);
-							curr.addContent("\n");
-						}
-
-//						System.out.println(curr.getName());
 					}
 
 					XMLOutputter outputter = new XMLOutputter();
-					FileWriter writer = 
+					FileWriter writer =
 							new FileWriter("/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/NASA_Template/web/layers/NewLayers.xml");
 					outputter.output(doc, writer);
 					writer.close();
@@ -173,46 +152,46 @@ public class App {
 		}
 	}
 
-	public static void publishLayer(String fileToPublish) throws IOException{
-			String RESTURL = "http://localhost:8080/geoserver";
-			String RESTUSER = "admin";
-			String RESTPW = "geoserver";
+	public static void publishLayer(String fileToPublish) throws IOException {
+		String RESTURL = "http://localhost:8080/geoserver";
+		String RESTUSER = "admin";
+		String RESTPW = "geoserver";
 
-			// write 
-			String workspace = "nasa";
-			String store = "newstore";
-			String server= "http://localhost:8080/geoserver/wms"; 
-			String filePath = "/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/exampleData/tiles/";
+		// write 
+		String workspace = "nasa";
+		String store = "newstore";
+		String server = "http://localhost:8080/geoserver/wms";
+		String filePath = "/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/exampleData/tiles/";
 
-				GeoServerRESTPublisher publisherGeoserver = new GeoServerRESTPublisher(RESTURL, RESTUSER, RESTPW);
+		GeoServerRESTPublisher publisherGeoserver = new GeoServerRESTPublisher(RESTURL, RESTUSER, RESTPW);
 
-				File geotiff = new File(fileToPublish);
-				String fileName = geotiff.getName();
+		File geotiff = new File(fileToPublish);
+		String fileName = geotiff.getName();
 
-				System.out.println("FileName: "+fileName);
-				String coverageName = fileName;
+		System.out.println("FileName: " + fileName);
+		String coverageName = fileName;
 
-				String srs = "EPSG:4326";
-				String def = "default";
+		String srs = "EPSG:4326";
+		String def = "default";
 
-				ProjectionPolicy proj = ProjectionPolicy.REPROJECT_TO_DECLARED;
+		ProjectionPolicy proj = ProjectionPolicy.REPROJECT_TO_DECLARED;
 
-				boolean created = publisherGeoserver.createWorkspace(workspace);
-				if (created) {
-					System.out.println("New workspace created yeah babe!");
-				}
+		boolean created = publisherGeoserver.createWorkspace(workspace);
+		if (created) {
+			System.out.println("New workspace created yeah babe!");
+		}
 
-				GeotiffReader reader = new GeotiffReader(fileToPublish);
-				if (reader.isGeotiff()) {
-					GeoCodec geo = reader.getGeoCodec();
-					//now get bounding box coordinates for entire image
+		GeotiffReader reader = new GeotiffReader(fileToPublish);
+		if (reader.isGeotiff()) {
+			GeoCodec geo = reader.getGeoCodec();
+			//now get bounding box coordinates for entire image
 
-					double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
-					BoundaryBox BBOX = new BoundaryBox(bbox[0],bbox[1],bbox[2],bbox[3]);
+			double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
+			BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[1], bbox[2], bbox[3]);
 
-					System.out.println("Pusblishing Geotiff file name: "+geotiff.getName()+" with BBOX: "+BBOX.toString());
-					publisherGeoserver.publishGeoTIFF(workspace, store, coverageName, geotiff, srs, proj, def, bbox);
-				}
+			System.out.println("Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString());
+			publisherGeoserver.publishGeoTIFF(workspace, store, coverageName, geotiff, srs, proj, def, bbox);
+		}
 
 	}
 }
