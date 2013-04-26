@@ -18,6 +18,9 @@ import com.nasageeks.hello.BoundaryBox;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jdom.JDOMException;
 
 /**
  * Automatic application that upload NASA geotiff files into a Geoserver website
@@ -35,7 +38,7 @@ public class App {
 			System.out.println("Current dir using System:" + currentDir);
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args){
 
 		//TODO we should have 3 workspaces
 		try {
@@ -50,7 +53,6 @@ public class App {
 
 			// write 
 			String workspace = props.getProperty("workspace");
-			String store = props.getProperty("store");
 			String server = props.getProperty("server");
 			String filePath = props.getProperty("filePath");
 
@@ -86,8 +88,10 @@ public class App {
 					double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
 					BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[1], bbox[2], bbox[3]);
 
-					System.out.println("Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString());
-					publisherGeoserver.publishGeoTIFF(workspace, store, coverageName, geotiff, srs, proj, def, bbox);
+					String store = props.getProperty("store");
+					store = store+"_"+x;
+					System.out.println("Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString() + " in store:"+store);
+					publisherGeoserver.publishGeoTIFF(workspace, store , coverageName, geotiff, srs, proj, def, bbox);
 
 					SAXBuilder builder = new SAXBuilder(); //used to read XML
 
@@ -121,17 +125,19 @@ public class App {
 //							System.out.println(curr.getName());
 
 							Element newElement = new Element("layer");
-							newElement.setAttribute("Menu", fileName);
 							newElement.setAttribute("EN", fileName);
 							newElement.setAttribute("BBOX", BBOX.toString());
 							newElement.setAttribute("server", server);
 							newElement.setAttribute("tiled", "true");
 							newElement.setAttribute("format", "image/jpeg");
-							newElement.setAttribute("style", "raster");
+							newElement.setAttribute("name", workspace + ":" + fileName);
 
 							if (curr.getName().equals("VectorLayers")) {
+								newElement.setAttribute("Menu", fileName);
 								newElement.setAttribute("selected", "true");
-								newElement.setAttribute("name", workspace + ":" + fileName);
+							}else{
+								newElement.setAttribute("Menu", "nasa,"+fileName);
+								newElement.setAttribute("style", "raster");
 							}
 
 							curr.addContent(newElement);
@@ -141,14 +147,16 @@ public class App {
 
 					XMLOutputter outputter = new XMLOutputter();
 					FileWriter writer =
-							new FileWriter("/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/NASA_Template/web/layers/NewLayers.xml");
+							new FileWriter(layersFile);
 					outputter.output(doc, writer);
 					writer.close();
 
 				}
 			}
-		} catch (Exception ex) {
-			System.out.println("Bad 2 EXCEPTION:" + ex.getMessage());
+		} catch (JDOMException ex) {
+			Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (IOException ex) {
+			System.out.println("IOException:" + ex.getMessage());
 		}
 	}
 

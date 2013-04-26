@@ -10,6 +10,8 @@
 <MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
     <MenuEntries>
         <MenuEntry ID="test" EN="TEST" ES="TEST ESP"/>
+        <MenuEntry ID="bluemarble" EN="Blue Marble" ES="Blue Marble"/>
+        <MenuEntry ID="nasa" EN="NASA" ES="NASA"/>
         <MenuEntry ID="geotifftest" EN="Geotiff test" ES="Geotiff ESP"/>
         <MenuEntry ID="teststates" EN="US states" ES="Estados"/>
     </MenuEntries>
@@ -24,8 +26,8 @@
     <!-- GeotiffLayer -->
     <MainLayers BBOX="-125.02083333333,24.062499999999996,-66.47916666198,49.937500002069996" 
         format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms"
-        width="764" height="330" tiled="true" ncWMS="false">  
-        <layer Menu="test,geotifftest" EN="Geotiff" ES="Geotiff ESP" name="se_clim:TotPrec2010Jan"/>
+        tiled="true" ncWMS="false">  
+        <layer Menu="bluemarble" name="comm:pyrResult512" featureInfo="comm:gebco" title="GEBCO" EN="The Blue Marble"/>
     </MainLayers>
 
     <VectorLayers BBOX="-120,-59.983333333333,-10,50.0166666666666" 
