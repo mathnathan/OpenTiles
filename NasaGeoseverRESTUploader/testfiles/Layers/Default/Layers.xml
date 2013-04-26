@@ -1,39 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Document   : TreeExample.xml
     Created on : October 17, 2011, 11:02 AM
     Author     : Olmo Zavala Romerozavala
     Description:
         Purpose of the document follows.
--->
-
-<MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
+--><MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
     <MenuEntries>
-        <MenuEntry ID="test" EN="TEST" ES="TEST ESP"/>
-        <MenuEntry ID="bluemarble" EN="Blue Marble" ES="Blue Marble"/>
-        <MenuEntry ID="nasa" EN="NASA" ES="NASA"/>
-        <MenuEntry ID="geotifftest" EN="Geotiff test" ES="Geotiff ESP"/>
-        <MenuEntry ID="teststates" EN="US states" ES="Estados"/>
-    </MenuEntries>
+        <MenuEntry ID="test" EN="TEST" ES="TEST ESP" />
+        <MenuEntry ID="bluemarble" EN="Blue Marble" ES="Blue Marble" />
+        <MenuEntry ID="nasa" EN="NASA" ES="NASA" />
+        <MenuEntry ID="geotifftest" EN="Geotiff test" ES="Geotiff ESP" />
+        <MenuEntry ID="teststates" EN="US states" ES="Estados" />
+    <MenuEntry ID="tempMaximaTiff_1_2.tif" EN="tempMaximaTiff_1_2.tif" />
+</MenuEntries>
 
-    <BackgroundLayers BBOX="-180,90,-90,180" 
-        format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms">
-        <layer name="comm:pyrResult512" featureInfo="comm:gebco" title="GEBCO"/>
+    <BackgroundLayers BBOX="-180,90,-90,180" format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms">
+        <layer name="comm:pyrResult512" featureInfo="comm:gebco" title="GEBCO" />
         <!--format="image/jpeg" proj="EPSG:4326" server="http://185.12.6.237:8080/geoserver/earthtiles/wms">-->
         <!--<layer name="earthtiles:landsat" title="GEBCO"/>-->
     </BackgroundLayers>
 
     <!-- GeotiffLayer -->
-    <MainLayers BBOX="-125.02083333333,24.062499999999996,-66.47916666198,49.937500002069996" 
-        format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms"
-        tiled="true" ncWMS="false">  
-        <layer Menu="bluemarble" name="comm:pyrResult512" featureInfo="comm:gebco" title="GEBCO" EN="The Blue Marble"/>
-    </MainLayers>
+    <MainLayers BBOX="-125.02083333333,24.062499999999996,-66.47916666198,49.937500002069996" format="image/jpeg" proj="EPSG:4326" server="http://viewer.coaps.fsu.edu/geoserver/wms" tiled="true" ncWMS="false">  
+        <layer Menu="bluemarble" name="comm:pyrResult512" featureInfo="comm:gebco" title="GEBCO" EN="The Blue Marble" />
+</MainLayers>
 
-    <VectorLayers BBOX="-120,-59.983333333333,-10,50.0166666666666" 
-        format="image/jpeg"  server="http://viewer.coaps.fsu.edu/geoserver/wms"
-        tiled="true" trans_effect="none" vectorLayer="true"> 
+    <VectorLayers BBOX="-120,-59.983333333333,-10,50.0166666666666" format="image/jpeg" server="http://viewer.coaps.fsu.edu/geoserver/wms" tiled="true" trans_effect="none" vectorLayer="true"> 
         <layer Menu="teststates" name="comm:states" selected="true" />
-    </VectorLayers>
+</VectorLayers>
 </MenuConf>
-

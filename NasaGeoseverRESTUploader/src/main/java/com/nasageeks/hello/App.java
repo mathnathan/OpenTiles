@@ -15,11 +15,17 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import com.nasageeks.hello.BoundaryBox;
+import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
+import it.geosolutions.geoserver.rest.decoder.RESTCoverageList;
+import it.geosolutions.geoserver.rest.decoder.RESTLayer;
+import it.geosolutions.geoserver.rest.decoder.RESTResource;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
+import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
 import java.io.FileInputStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.util.logging.LoggerFactory;
 import org.jdom.JDOMException;
 
 /**
@@ -40,7 +46,6 @@ public class App {
 
 	public static void main(String[] args){
 
-		//TODO we should have 3 workspaces
 		try {
 
 			String RESTURL = "http://localhost:8080/geoserver";
@@ -58,11 +63,10 @@ public class App {
 
 			String[] geotTiffFiles = FileManager.filesInFolder(filePath, new geotiffFileFilter());
 
+			GeoServerRESTReader readerGeoserver = new GeoServerRESTReader(RESTURL, RESTUSER, RESTPW);
+			GeoServerRESTPublisher publisherGeoserver = new GeoServerRESTPublisher(RESTURL, RESTUSER, RESTPW);
+
 			for (int x = 0; x < geotTiffFiles.length; x++) {
-
-				GeoServerRESTReader readerGeoserver = new GeoServerRESTReader(RESTURL, RESTUSER, RESTPW);
-				GeoServerRESTPublisher publisherGeoserver = new GeoServerRESTPublisher(RESTURL, RESTUSER, RESTPW);
-
 				File geotiff = new File(geotTiffFiles[x]);
 				String fileName = geotiff.getName();
 
@@ -74,32 +78,62 @@ public class App {
 
 				ProjectionPolicy proj = ProjectionPolicy.REPROJECT_TO_DECLARED;
 
+				//Adding the nasa workspace into geoserver (only once should be done)
 				boolean created = publisherGeoserver.createWorkspace(workspace);
 				if (created) {
 					System.out.println("The workspace "+workspace+" has been created, yeah!");
 				}
 
+				//Reads the Geotiff file and extracts the boundaries
 				GeotiffReader reader = new GeotiffReader(geotTiffFiles[x]);
 				if (reader.isGeotiff()) {
 					GeoCodec geo = reader.getGeoCodec();
-					//now get bounding box coordinates for entire image
 
+					//now get bounding box coordinates for entire image
 					@SuppressWarnings("MismatchedReadAndWriteOfArray")
 					double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
-					BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[1], bbox[2], bbox[3]);
+					BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[2], bbox[3], bbox[1]);
 
+					//---- Creates one new store for file
 					String store = props.getProperty("store");
 					store = store+"_"+x;
-					System.out.println("Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString() + " in store:"+store);
-					publisherGeoserver.publishGeoTIFF(workspace, store , coverageName, geotiff, srs, proj, def, bbox);
 
+					System.out.println("------- Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString() + " in store:"+store);
+					created = publisherGeoserver.publishGeoTIFF(workspace, store , coverageName, geotiff, srs, proj, def, bbox);
+					if(created){
+						System.out.println("------------ Layer "+workspace+":"+coverageName+" added SUCCESSFULLY!");
+					}else{
+						System.out.println("!!!!!!!!ERROR adding layer "+workspace+":"+coverageName+" (it may already exist in Geoserver)");
+						//We should go to the next file here, but because the previous error
+						// can occur if we try to upload one layer that is already in geoserver
+						// in that case we should still modify the XML file for visualization
+//						break;//Try with the next file
+					}
+
+					//--------- Read the newly uploaded layer and change its Meta data and boundary box
+					RESTCoverage coverage = readerGeoserver.getCoverage(workspace,store,coverageName);
+					System.out.println(coverage.getName()+" ..max:"+coverage.getMaxX());
+
+					GSCoverageEncoder layerEncoder = new GSCoverageEncoder();
+					layerEncoder.setNativeBoundingBox(bbox[0], bbox[3], bbox[2], bbox[1], srs);
+					layerEncoder.setName(coverage.getName());
+					boolean success = publisherGeoserver.configureCoverage(layerEncoder, workspace, store);
+					if(success){
+						System.out.println("--------- BBOX has been updated for "+coverageName);
+					}else{
+						System.out.println("!!!!!!!!ERROR BBOX FAIL to be updated for "+coverageName);
+					}
+
+					//---------- Modifying XML file for automatic visualization
+					//---------- All this code should also go into a different Java file
 					SAXBuilder builder = new SAXBuilder(); //used to read XML
 
-					String layersFile = props.getProperty("layers");
+					String layersPath = props.getProperty("layers");
+					String layersFile = "";
 					if (x == 0) {
-						layersFile = layersFile+"Default/Layers.xml";
+						layersFile = layersPath+"Default/Layers.xml";
 					} else {
-						layersFile = layersFile+"NewLayers.xml";
+						layersFile = layersPath+"NewLayers.xml";
 					}
 
 					Document doc = builder.build(layersFile);
@@ -147,7 +181,7 @@ public class App {
 
 					XMLOutputter outputter = new XMLOutputter();
 					FileWriter writer =
-							new FileWriter(layersFile);
+							new FileWriter(layersPath+"NewLayers.xml");
 					outputter.output(doc, writer);
 					writer.close();
 
@@ -161,45 +195,6 @@ public class App {
 	}
 
 	public static void publishLayer(String fileToPublish) throws IOException {
-		String RESTURL = "http://localhost:8080/geoserver";
-		String RESTUSER = "admin";
-		String RESTPW = "geoserver";
-
-		// write 
-		String workspace = "nasa";
-		String store = "newstore";
-		String server = "http://localhost:8080/geoserver/wms";
-		String filePath = "/home/olmozavala/Dropbox/NewATLAS/GeoserverREST/exampleData/tiles/";
-
-		GeoServerRESTPublisher publisherGeoserver = new GeoServerRESTPublisher(RESTURL, RESTUSER, RESTPW);
-
-		File geotiff = new File(fileToPublish);
-		String fileName = geotiff.getName();
-
-		System.out.println("FileName: " + fileName);
-		String coverageName = fileName;
-
-		String srs = "EPSG:4326";
-		String def = "default";
-
-		ProjectionPolicy proj = ProjectionPolicy.REPROJECT_TO_DECLARED;
-
-		boolean created = publisherGeoserver.createWorkspace(workspace);
-		if (created) {
-			System.out.println("New workspace created yeah babe!");
-		}
-
-		GeotiffReader reader = new GeotiffReader(fileToPublish);
-		if (reader.isGeotiff()) {
-			GeoCodec geo = reader.getGeoCodec();
-			//now get bounding box coordinates for entire image
-
-			double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
-			BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[1], bbox[2], bbox[3]);
-
-			System.out.println("Pusblishing Geotiff file name: " + geotiff.getName() + " with BBOX: " + BBOX.toString());
-			publisherGeoserver.publishGeoTIFF(workspace, store, coverageName, geotiff, srs, proj, def, bbox);
-		}
-
 	}
+
 }
