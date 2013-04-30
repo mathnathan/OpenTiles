@@ -74,5 +74,19 @@ user to zoom in and out of the data in a more natural way. We use the GDAL to cr
 the various pyramids and tiles.
 
 ##### 4) Automatic Geoserver Integration
+[Geoserver REST interface]: http://docs.geoserver.org/2.0.0/user/extensions/rest/index.html 
+[Geoserver Manager]: https://github.com/geosolutions-it/geoserver-manager/wiki
+Once the pyramids are obtained, we are using the [Geoserver REST interface][] to 
+upload them into Geoserver. Specifically, we are using the [Geoserver Manager][] java 
+library to read the contents of the pyramids and upload them into Geoserver automatically.
+Once the pyramids are uploaded into Geoserver they can be served as 
+images using the WMS standard (for OpenLayers, Leafleat, etc.), kml files (for
+Google Earth) and GeoTiff files (for GIS).
 
 ##### 5) Demo - Tile Display
+For visualizing the tiles that get uploaded into Geoserver, we are cofiguring
+a web site that displays all the layers available in the server and it allows
+the user to change the transparency of the layers, choose which layers to display,
+download the layer as kml and Geotiff format and zooming in and out of the map
+in a similar interface that Google maps does it. 
+All these without any external intervention.
