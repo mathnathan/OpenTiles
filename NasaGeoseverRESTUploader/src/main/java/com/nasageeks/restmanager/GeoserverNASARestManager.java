@@ -59,7 +59,6 @@ public class GeoserverNASARestManager {
 			GeoCodec geo = reader.getGeoCodec();
 
 			//now get bounding box coordinates for entire image
-			@SuppressWarnings("MismatchedReadAndWriteOfArray")
 			double[] bbox = geo.getBoundingBox(reader.getWidth(0), reader.getHeight(0));
 			BoundaryBox BBOX = new BoundaryBox(bbox[0], bbox[2], bbox[3], bbox[1]);
 
