@@ -13,7 +13,6 @@ import java.io.FileFilter;
  */
 public class xmlFileFilter implements FileFilter{
 
-	@Override
 	public boolean accept(File pathname) {
 		if(pathname.getName().endsWith(".xml"))
 			return true;

@@ -68,7 +68,6 @@ public class BoundaryBox {
         this.minLong = val;
     }
 
-    @Override
     /**
      * This function is used to convert the boundary box in a string separated by commas
      * in the format necesary for OpenLayers

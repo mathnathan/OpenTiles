@@ -6,12 +6,10 @@ import com.nasageeks.restmanager.GeoserverNASARestManager;
 import com.nasageeks.viewer.ViewerManager;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jdom.JDOMException;
 
 /**
  * Automatic application that upload NASA geotiff files into a Geoserver website
@@ -82,9 +80,7 @@ public class App {
 				ViewerManager.addNewLayer(FileManager.removeExt(pyramid.getName()), server, workspace, bbox, layersInputFile, layersOutputFile);
 			}
 
-		} catch (IOException ex) {
-			Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (JDOMException ex) {
+		} catch (Exception ex) {
 			Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
 			try {

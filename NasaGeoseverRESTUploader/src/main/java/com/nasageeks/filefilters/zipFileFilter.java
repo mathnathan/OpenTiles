@@ -12,7 +12,6 @@ import java.io.FileFilter;
  */
 public class zipFileFilter implements FileFilter{
 
-	@Override
 	public boolean accept(File pathname) {
 		if(pathname.getName().endsWith(".zip"))
 			return true;
