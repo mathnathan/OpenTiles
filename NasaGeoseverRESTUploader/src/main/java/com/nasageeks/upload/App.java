@@ -62,7 +62,7 @@ public class App {
 
 					//Updates the XML of the map viewer.
 					System.out.println("---- Adding new layer into the Map Visualizer");
-					ViewerManager.addNewLayer(FileManager.removeExt(pyramid.getName()), server, workspace, bbox, layersInputFile, layersOutputFile);
+					ViewerManager.addNewLayer(FileManager.removeExt(pyramid.getName()), server+"/wms", workspace, bbox, layersInputFile, layersOutputFile);
 
 					//Changes the input file as the output file after the first layer is updated
 					if (fileNumber == 0) {
@@ -74,7 +74,6 @@ public class App {
 				}
 			}
 
-			/*
 			String[] geotTiffFiles = FileManager.filesInFolder(filePath, new geotiffFileFilter());
 			
 			basestore = props.getProperty("store");
@@ -93,7 +92,7 @@ public class App {
 					BoundaryBox bbox = restMan.publishGeoTiff(geotiff, workspace);
 
 					//Updates the XML of the map viewer.
-					ViewerManager.addNewLayer(geotiff.getName(), server, workspace, bbox, layersInputFile, layersOutputFile);
+					ViewerManager.addNewLayer(geotiff.getName(), server+"/wms", workspace, bbox, layersInputFile, layersOutputFile);
 
 					//Changes the input file as the output file after the first layer is updated
 					if (fileNumber == 0) {
@@ -102,7 +101,7 @@ public class App {
 				} catch (Exception ex) {
 					System.out.println("ERROR!!!! Fail to upload GeoTIFF file "+geotiff.getName() + " EX:"+ex.getMessage());
 				}
-			}*/
+			}
 
 		} catch (Exception ex) {
 			System.out.println("ERROR!!!! Exception: "+ex.getMessage());

@@ -93,7 +93,12 @@ public class GeoserverNASARestManager {
 			//---- Creates one new store for file
 
 			System.out.println("\n---- Pusblishing Geotiff : " + fileName + " with BBOX: " + BBOX.toString());
-			created = publisherGeoserver.publishGeoTIFF(workspace, coverageName, geoTiffFile);
+			try {
+				created = publisherGeoserver.publishGeoTIFF(workspace, coverageName, geoTiffFile);
+			} catch (Exception ex) {
+				created = false;
+			}
+
 			if (created) {
 				System.out.println("**** Layer " + workspace + ":" + coverageName + " added SUCCESSFULLY!");
 			} else {
@@ -140,7 +145,7 @@ public class GeoserverNASARestManager {
 
 		try {
 			created = publisherGeoserver.publishImageMosaic(workspace, store, mosaicFile);
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			created = false;
 		}
 
