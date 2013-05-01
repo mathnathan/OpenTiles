@@ -55,7 +55,7 @@ public class FileManager {
 		}
 
 		if(idx == 0){//No file was found
-			System.out.println("There is no XML files for the layers configuration" + " at: " + folder +" !!!");
+			System.out.println("There are no files at folder: " + folder +" !!!");
 		}
 		return xmlFiles;
 	}

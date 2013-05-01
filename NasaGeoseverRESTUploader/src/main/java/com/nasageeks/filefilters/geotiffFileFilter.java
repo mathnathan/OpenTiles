@@ -15,7 +15,7 @@ import java.io.FileFilter;
 public class geotiffFileFilter implements FileFilter{
 
 	public boolean accept(File pathname) {
-		if(pathname.getName().endsWith(".tif"))
+		if( (pathname.getName().endsWith(".tiff")) || (pathname.getName().endsWith(".tif")) )
 			return true;
 		else
 			return false;

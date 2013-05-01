@@ -69,7 +69,7 @@ public class GeoserverNASARestManager {
 			if (created) {
 				System.out.println("------------ Layer " + workspace + ":" + coverageName + " added SUCCESSFULLY!");
 			} else {
-				System.out.println("!!!!!!!!ERROR adding layer " + workspace + ":" + coverageName + " (it may already exist in Geoserver)");
+				System.out.println("WARNING Adding layer " + workspace + ":" + coverageName + " (it may already exist in Geoserver)");
 				//We should go to the next file here, but because the previous error
 				// can occur if we try to upload one layer that is already in geoserver
 				// in that case we should still modify the XML file for visualization
@@ -87,7 +87,7 @@ public class GeoserverNASARestManager {
 			if (success) {
 				System.out.println("--------- BBOX has been updated for " + coverageName);
 			} else {
-				System.out.println("!!!!!!!!ERROR BBOX FAIL to be updated for " + coverageName);
+				System.out.println("WARN BBOX FAIL to be updated for " + coverageName);
 			}
 
 			return BBOX;
@@ -113,13 +113,12 @@ public class GeoserverNASARestManager {
 		}
 		
 		//---- Creates one new store for file
-		System.out.println("------- Pusblishing mosaic file name: " + fileName + " in store:" + store);
+		System.out.println("------- Pusblishing mosaic file name: " + mosaicFile.getAbsoluteFile() + " in store:" + store+ " workspace: " + workspace);
 		created = publisherGeoserver.publishImageMosaic(workspace, store, mosaicFile);
 		if (created) {
 			System.out.println("------------ Layer " + workspace + ":" + coverageName + " added SUCCESSFULLY!");
 		} else {
-			System.out.println("!!!!!!!!ERROR adding layer " + workspace + ":" + coverageName + " (it may already exist in Geoserver)");
-			//We should go to the next file here, but because the previous error
+			System.out.println("WARN adding layer " + workspace + ":" + coverageName + " (it may already exist in Geoserver)"); //We should go to the next file here, but because the previous error
 			// can occur if we try to upload one layer that is already in geoserver
 			// in that case we should still modify the XML file for visualization
 			//						break;//Try with the next file
