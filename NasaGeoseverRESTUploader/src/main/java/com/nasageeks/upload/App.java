@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Automatic application that upload NASA geotiff files into a Geoserver website
@@ -19,9 +17,8 @@ public class App {
 
 	public static void main(String[] args) {
 
-		String RESTURL = "http://localhost/geoserver";
 		String RESTUSER = "admin";
-		String RESTPW = "geoserver";
+		String RESTPW = "sopasperico";
 		FileInputStream file = null;
 
 		try {
@@ -38,10 +35,12 @@ public class App {
 			System.out.println("Layers ---- "+layersPath);
 			System.out.println("Files ---- "+filePath);
 
-			GeoserverNASARestManager restMan = new GeoserverNASARestManager(RESTURL, RESTUSER, RESTPW);
+			GeoserverNASARestManager restMan = new GeoserverNASARestManager(server, RESTUSER, RESTPW);
+
+//			restMan.createWorkspace(workspace);
 
 			String layersOutputFile = layersPath + "NewLayers.xml";
-			String layersInputFile = "";
+			String layersInputFile = layersPath + "Default/Layers.xml";
 
 			String store;
 
@@ -50,35 +49,38 @@ public class App {
 			//Iterates over every file
 			basestore = basestore+ "_pyramid";
 
-			System.out.println("Reading Pyramid (zip files)....");
+			System.out.println("---- Reading Pyramid (zip files)....");
 			File pyramid = null;
 			for (int fileNumber = 0; fileNumber < mosaicFiles.length; fileNumber++) {
 				try{
 					pyramid = new File(mosaicFiles[fileNumber]);
-
-					System.out.println("DEBUG 1");
-
-					store = basestore+ "_" + fileNumber;
-					System.out.println("DEBUG 2");
+					store = basestore+ "_" + fileNumber;//Incremental name for store
 
 					//Publishes the geotiff file
 					BoundaryBox bbox = restMan.publishMosaic(pyramid, workspace, store);
-					System.out.println("DEBUG 3");
+
 
 					//Updates the XML of the map viewer.
+					System.out.println("---- Adding new layer into the Map Visualizer");
 					ViewerManager.addNewLayer(FileManager.removeExt(pyramid.getName()), server, workspace, bbox, layersInputFile, layersOutputFile);
-					System.out.println("DEBUG 4");
+
+					//Changes the input file as the output file after the first layer is updated
+					if (fileNumber == 0) {
+						layersInputFile = layersOutputFile;
+					}
+
 				} catch (Exception ex) {
-					System.out.println("ERROR! Fail to upload PYRAMID file "+pyramid.getName());
+					System.out.println("ERROR!!!! Fail to upload PYRAMID file "+pyramid.getName() + " EX:"+ex.getMessage());
 				}
 			}
 
 			String[] geotTiffFiles = FileManager.filesInFolder(filePath, new geotiffFileFilter());
 			
 			basestore = props.getProperty("store");
+			basestore = basestore+ "_tiff";
 
 			//Iterates over every file
-			System.out.println("Reading Geotiff files....");
+			System.out.println("---- Reading Geotiff files....");
 			File geotiff = null;
 			for (int fileNumber = 0; fileNumber < geotTiffFiles.length; fileNumber++) {
 				try{
@@ -89,27 +91,26 @@ public class App {
 					//Publishes the geotiff file
 					BoundaryBox bbox = restMan.publishGeoTiff(geotiff, workspace, store);
 
-					if (fileNumber == 0) {
-						layersInputFile = layersPath + "Default/Layers.xml";
-					} else {
-						layersInputFile = layersOutputFile;
-					}
-
 					//Updates the XML of the map viewer.
 					ViewerManager.addNewLayer(geotiff.getName(), server, workspace, bbox, layersInputFile, layersOutputFile);
+
+					//Changes the input file as the output file after the first layer is updated
+					if (fileNumber == 0) {
+						layersInputFile = layersOutputFile;
+					}
 				} catch (Exception ex) {
-					System.out.println("ERROR! Fail to upload GeoTIFF file "+pyramid.getName());
+					System.out.println("ERROR!!!! Fail to upload GeoTIFF file "+geotiff.getName() + " EX:"+ex.getMessage());
 				}
 			}
 
 
 		} catch (Exception ex) {
-			System.out.println("Exception: "+ex.getMessage());
+			System.out.println("ERROR!!!! Exception: "+ex.getMessage());
 		} finally {
 			try {
 				file.close();
 			} catch (IOException ex) {
-				System.out.println("IOException: "+ex.getMessage());
+				System.out.println("ERROR!!!! IOException: "+ex.getMessage());
 			}
 		}
 	}
