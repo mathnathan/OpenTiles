@@ -34,13 +34,11 @@ Maps or MapQuest.
 <br />
 
 #### OS Support
-* Windows 7
-* Mac OSX
-* Ubuntu 12.04. 12.10
+* Ubuntu 12.04, 12.10, 13.04
 
 #### Dependencies
-[GDAL]: http://www.gdal.org/
-[GDAL][] - Geospatial Data Abstraction Library
+[GDAL-1.9]: http://www.gdal.org/
+[GDAL-1.9][] - Geospatial Data Abstraction Library
 
 #### Project Description
 
