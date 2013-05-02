@@ -261,7 +261,11 @@ savvy users.
 
 # This very poorly emulates a specific database relationship using dictionaries and lists
 # however it will suffice for our proof of concept
-SOURCES = "ftp://weldftp.cr.usgs.gov/ALASKA/2003/weekly/week14/Alaska.week14.2003.h00v13.v1.5.hdf"
+#SOURCES = "ftp://weldftp.cr.usgs.gov/ALASKA/2003/weekly/week14/Alaska.week14.2003.h00v13.v1.5.hdf"
+#SOURCES = "ftp://weldftp.cr.usgs.gov/CONUS/2012/seasonal/autumn/CONUS.autumn.2012.h18v08.doy249to329.v1.5.hdf"
+#SOURCES = "ftp://weldftp.cr.usgs.gov/CONUS/2012/seasonal/autumn/CONUS.autumn.2012.h19v18.doy246to333.v1.5.hdf"
+SOURCES = "http://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A20120012012366.L3m_YR_SST_4.bz2"
+#SOURCES = "http://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A2012001.L3m_DAY_SST_4.bz2"
 # Skips the date and time
 PRODUCTS = {2: SOURCES}
 COLLECTIONS = {"AS3": PRODUCTS}

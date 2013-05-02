@@ -6,6 +6,8 @@ from ftplib import FTP
 from dataSources import DATA_FIELD
 from converter import convert
 from generateTiles import makeTiles
+import re
+import subprocess as sp
 
 # CHECK FTP
 def updated( url ):
@@ -62,10 +64,11 @@ def dlhttp( full_url ):
     filename = url_list[-1]
     print "Downloading" + filename + "...\n"
     path2file = '/'.join(url_list[3:])
+    dlDIR = None
 
     # Open the url
     try:
-        f = urlopen(url)
+        f = urlopen(full_url)
 
         # Open our local file for writing
         dlDir = DST_DIR+filename
@@ -78,7 +81,16 @@ def dlhttp( full_url ):
     except URLError, e:
         print "URL Error:", e.reason, url
 
-    return dlDir
+    if re.search( "bz2", filename ):
+        print "filename = ", filename
+        print "dlDir = ", dlDir
+        if os.path.exists(dlDir):
+            sp.call(["bunzip2", dlDir])
+            dlDir = dlDir[:-4]
+            dlDir_final = dlDir+".hdf"
+            sp.call(["mv", dlDir, dlDir_final])
+
+    return dlDir_final
 
 def extractURL( dField=None, dType=None, sensor=None, collection=None,
         product=None ):
@@ -104,7 +116,7 @@ def main():
     url = extractURL( field, dtype, sensor, collection, product )
 
     if( updated( url ) ):
-        dlFile = download( url, "FTP" )
+        dlFile = download( url )
         abs_path = convert( dlFile, "HDF" )
         makeTiles( abs_path )
     else:
