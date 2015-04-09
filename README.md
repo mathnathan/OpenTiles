@@ -3,11 +3,11 @@
 
 ------------------------------------------------
 
-** This project is still under very heavy development **
+** This project is still in development **
 
-This is a solution to the 2013 International Space Apps Challenge "Earth Tiles". 
+This is a solution to the [2013](https://2013.spaceappschallenge.org/) International Space Apps Challenge ["Earth Tiles"](https://2013.spaceappschallenge.org/challenge/earthtiles/). 
 The challenge is to create a service, for developers, which provides access to 
-sattelite derived tiles at various scales. These tiles would be used for various
+satellite derived tiles at various scales. These tiles would be used for various
 projects similar to OpenLayers applications, some of which might resemble Google 
 Maps or MapQuest.
 
